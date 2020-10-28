@@ -8,7 +8,7 @@ import 'package:window_size/window_size.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isMacOS) {
-    setWindowMinSize(const Size(850, 400));
+    setWindowMinSize(const Size(900, 400));
   }
 
   runApp(MyApp());

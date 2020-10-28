@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_student/components/CustomButton.dart';
 import 'package:macos_student/models/Candidate.dart';
@@ -8,119 +9,129 @@ import 'package:macos_student/services/CandidateService.dart';
 class CandidatePage extends StatelessWidget {
   final service = CandidateService();
 
-  void updateCandidate(BuildContext context, Candidate candidate) {
+  void _updateCandidate(BuildContext context, Candidate candidate) {
     Navigator.pushNamed(context, CandidateCreate.routeName,
         arguments: CandidateArgs(candidate));
   }
 
-  Widget buildListCandidates(BuildContext ctx, List<Candidate> candidates) =>
-      (candidates == null || candidates.isEmpty)
-          ? Text("Aucune candidature..",
-              style: Theme.of(ctx).textTheme.headline6)
-          : ListView.separated(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: candidates.length,
-              itemBuilder: (context, index) => Row(
-                children: [
-                  SizedBox(
-                    width: 50,
-                    child: Text(
-                      candidates[index].id.toString(),
-                      style: Theme.of(context).textTheme.bodyText1,
-                    ),
+  Future<void> _deleteCandidate(Candidate candidate) async {
+    await service.deleteCandidate(candidate);
+  }
+
+  List buildTableData(BuildContext context, List<Candidate> candidates) {
+    final data = [
+      TableRow(children: [
+        Text("#", style: Theme.of(context).textTheme.headline2),
+        Text("Organisation", style: Theme.of(context).textTheme.headline2),
+        Text("Email", style: Theme.of(context).textTheme.headline2),
+        Text("Réponse", style: Theme.of(context).textTheme.headline2),
+        Text("Actions", style: Theme.of(context).textTheme.headline2),
+      ]),
+    ];
+    data.addAll(candidates.map((e) => TableRow(children: [
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              e.id.toString(),
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              e.companyName,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              e.email,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              e.response,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => _updateCandidate(context, e),
+                  child: Chip(
+                    backgroundColor: Theme.of(context).hintColor,
+                    label: Text("Modifier"),
                   ),
-                  SizedBox(
-                    width: 150,
-                    child: Text(candidates[index].companyName,
-                        style: Theme.of(context).textTheme.bodyText1),
+                ),
+                SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _deleteCandidate(e),
+                  child: Chip(
+                    backgroundColor: Colors.red,
+                    label: Text("Supprimer"),
                   ),
-                  SizedBox(
-                    width: 150,
-                    child: Text(
-                        candidates[index].email.isEmpty
-                            ? "❌"
-                            : candidates[index].email,
-                        style: Theme.of(context).textTheme.bodyText1),
-                  ),
-                  SizedBox(
-                    width: 200,
-                    child: Text(candidates[index].response,
-                        style: Theme.of(context).textTheme.bodyText1),
-                  ),
-                  SizedBox(
-                    width: 100,
-                    child: CustomButton(
-                      text: "Modifier",
-                      action: () => updateCandidate(context, candidates[index]),
-                    ),
-                  )
-                ],
-              ),
-              separatorBuilder: (BuildContext context, int index) => SizedBox(
-                height: 8,
-              ),
-            );
+                )
+              ],
+            ),
+          ),
+        ])));
+
+    return data;
+  }
+
+  Table buildTable(List<TableRow> rows) => Table(
+        columnWidths: {
+          0: FixedColumnWidth(50),
+          1: FixedColumnWidth(150),
+          2: FixedColumnWidth(150),
+          3: FixedColumnWidth(200),
+          4: FixedColumnWidth(250),
+        },
+        children: rows,
+      );
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Mes candidatures",
-              style: Theme.of(context).textTheme.headline1,
-            ),
-            CustomButton(
-              text: "Nouvelle candidature",
-              action: () => Navigator.pushNamed(
-                  context, CandidateCreate.routeName,
-                  arguments: CandidateArgs(null)),
-            )
-          ],
-        ),
-        SizedBox(height: 32),
-        Row(
-          children: [
-            SizedBox(
-              width: 50,
-              child: Text("#", style: Theme.of(context).textTheme.headline2),
-            ),
-            SizedBox(
-              width: 150,
-              child: Text("Organisation",
-                  style: Theme.of(context).textTheme.headline2),
-            ),
-            SizedBox(
-              width: 150,
-              child:
-                  Text("Email", style: Theme.of(context).textTheme.headline2),
-            ),
-            SizedBox(
-              width: 200,
-              child:
-                  Text("Réponse", style: Theme.of(context).textTheme.headline2),
-            ),
-            SizedBox(
-              width: 100,
-              child:
-                  Text("Action", style: Theme.of(context).textTheme.headline2),
-            ),
-          ],
-        ),
-        SizedBox(height: 16),
-        FutureBuilder<List<Candidate>>(
-          future: service.getAll(),
-          initialData: [],
-          builder: (context, snapshot) =>
-              snapshot.connectionState == ConnectionState.done
-                  ? buildListCandidates(context, snapshot.data)
-                  : CircularProgressIndicator(),
-        ),
-      ],
-    );
+    return FutureBuilder<List<Candidate>>(
+        future: service.getAll(),
+        initialData: [],
+        builder: (context, snapshot) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Mes candidatures",
+                    style: Theme.of(context).textTheme.headline1,
+                  ),
+                  CustomButton(
+                    text: "Nouvelle candidature",
+                    action: () => Navigator.pushNamed(
+                        context, CandidateCreate.routeName,
+                        arguments: CandidateArgs(null)),
+                  )
+                ],
+              ),
+              SizedBox(height: 32),
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.data != null)
+                buildTable(buildTableData(context, snapshot.data))
+              else if (snapshot.connectionState == ConnectionState.waiting)
+                CircularProgressIndicator()
+              else
+                Text(
+                  "Aucune candidature...",
+                  style: Theme.of(context).textTheme.headline2,
+                )
+            ],
+          );
+        });
   }
 }

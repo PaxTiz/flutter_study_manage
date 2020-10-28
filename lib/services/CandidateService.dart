@@ -28,4 +28,9 @@ class CandidateService {
     await db
         .update("candidates", c.toMap(), where: "id = ?", whereArgs: [c.id]);
   }
+
+  Future deleteCandidate(Candidate candidate) async {
+    final Database db = await getDatabase();
+    await db.delete("candidates", where: "id = ?", whereArgs: [candidate.id]);
+  }
 }
