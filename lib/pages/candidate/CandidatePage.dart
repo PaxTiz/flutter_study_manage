@@ -15,7 +15,7 @@ class CandidatePage extends StatelessWidget {
   }
 
   Future<void> _deleteCandidate(Candidate candidate) async {
-    await service.deleteCandidate(candidate);
+    await service.delete(candidate);
   }
 
   List buildTableData(BuildContext context, List<Candidate> candidates) {

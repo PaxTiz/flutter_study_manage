@@ -22,12 +22,12 @@ class CandidateForm extends StatelessWidget {
             companyName: nameController.value.text,
             email: emailController.value.text,
             response: responseController.value.text);
-        await service.insertCandidate(c);
+        await service.insert(c);
       } else {
         candidate.companyName = nameController.value.text;
         candidate.email = emailController.value.text;
         candidate.response = responseController.value.text;
-        await service.updateCandidate(candidate);
+        await service.update(candidate);
       }
 
       Navigator.pop(context);

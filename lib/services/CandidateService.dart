@@ -1,13 +1,21 @@
+import 'package:macos_student/models/Candidate.dart';
+import 'package:macos_student/services/Service.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../db.dart';
-import '../models/Candidate.dart';
 
-class CandidateService {
+class CandidateService implements Service<Candidate> {
+  static final CandidateService instance = CandidateService._internal();
+  String get tableName => "candidates";
+  Database db;
+
+  factory CandidateService() {
+    return instance;
+  }
+
   Future<List<Candidate>> getAll() async {
-    final Database db = await getDatabase();
     List<Map<String, dynamic>> candidates =
-        await db.query("candidates", orderBy: "id DESC");
+        await db.query(tableName, orderBy: "id DESC");
 
     if (candidates.length > 0)
       return List.generate(
@@ -18,19 +26,27 @@ class CandidateService {
     return null;
   }
 
-  Future insertCandidate(Candidate candidate) async {
-    final Database db = await getDatabase();
-    await db.insert("candidates", candidate.toMap());
+  Future<Candidate> get(int id) {
+    throw UnimplementedError();
   }
 
-  Future updateCandidate(Candidate c) async {
-    final Database db = await getDatabase();
+  Future<void> insert(Candidate data) async {
+    await db.insert(tableName, data.toMap());
+  }
+
+  Future<void> update(Candidate data) async {
     await db
-        .update("candidates", c.toMap(), where: "id = ?", whereArgs: [c.id]);
+        .update(tableName, data.toMap(), where: "id = ?", whereArgs: [data.id]);
   }
 
-  Future deleteCandidate(Candidate candidate) async {
-    final Database db = await getDatabase();
-    await db.delete("candidates", where: "id = ?", whereArgs: [candidate.id]);
+  Future<void> delete(Candidate data) async {
+    await db.delete(tableName, where: "id = ?", whereArgs: [data.id]);
+  }
+
+  Future<Database> init() async =>
+      await getDatabase().then((value) => db = value);
+
+  CandidateService._internal() {
+    init();
   }
 }
