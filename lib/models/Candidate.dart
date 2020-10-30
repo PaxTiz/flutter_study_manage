@@ -1,4 +1,6 @@
-class Candidate {
+import 'package:macos_student/models/Model.dart';
+
+class Candidate extends Model {
   final int id;
   String companyName;
   String email;
@@ -21,4 +23,5 @@ class Candidate {
       'response': response
     };
   }
+
 }
