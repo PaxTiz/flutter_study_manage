@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:macos_student/components/Sidebar.dart';
 import 'package:macos_student/pages/CustomPage.dart';
+import 'package:macos_student/pages/absences/AbsencePage.dart';
 import 'package:macos_student/pages/candidate/CandidatePage.dart';
 
 class Application extends StatefulWidget {
@@ -16,7 +17,7 @@ class _Application extends State<Application> {
       child: Text("Hello World"),
     ),
     CustomPage(
-      child: Text("Coucou 2"),
+      child: AbsencePage(),
     ),
     CustomPage(
       child: CandidatePage(),
