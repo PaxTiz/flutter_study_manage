@@ -5,12 +5,14 @@ import 'package:macos_student/pages/absences/AbsencePage.dart';
 import 'package:macos_student/pages/candidate/CandidatePage.dart';
 
 class Application extends StatefulWidget {
+  int _currentPage = 0;
+
+  Application(this._currentPage);
   createState() => _Application();
 }
 
 class _Application extends State<Application> {
-  int _currentPage = 0;
-  void setCurrentPage(int index) => setState(() => _currentPage = index);
+  void setCurrentPage(int index) => setState(() => widget._currentPage = index);
 
   final pages = <CustomPage>[
     CustomPage(
@@ -40,8 +42,8 @@ class _Application extends State<Application> {
           Sidebar(
               tiles: tiles,
               onSelectTile: setCurrentPage,
-              currentIndex: _currentPage),
-          pages[_currentPage],
+              currentIndex: widget._currentPage),
+          pages[widget._currentPage],
         ],
       ),
     );
