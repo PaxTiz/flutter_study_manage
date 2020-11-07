@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:macos_student/application.dart';
 import 'package:macos_student/components/CustomButton.dart';
 import 'package:macos_student/components/forms/CustomFormField.dart';
 import 'package:macos_student/models/Candidate.dart';
@@ -30,7 +32,11 @@ class CandidateForm extends StatelessWidget {
         await service.update(candidate);
       }
 
-      Navigator.pop(context);
+      Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => Application(2),
+          ));
     }
   }
 
