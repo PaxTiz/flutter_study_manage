@@ -14,3 +14,5 @@
 
 ## Screens
 > Don't forget to add screens to this README
+![Absences](screens/absences.png)
+![Applying](screens/candidates.png)
