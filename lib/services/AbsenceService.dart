@@ -1,13 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:macos_student/models/Absence.dart';
-import 'package:macos_student/services/Service.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../db.dart';
 
-class AbsenceService implements Service<Absence> {
+class AbsenceService with MyDatabase, ChangeNotifier {
   static final AbsenceService instance = AbsenceService._internal();
   String get tableName => "absences";
-  Database db;
+
+  List<Absence> absences = [];
 
   factory AbsenceService() {
     return instance;
@@ -17,13 +17,13 @@ class AbsenceService implements Service<Absence> {
     List<Map<String, dynamic>> candidates =
         await db.query(tableName, orderBy: "updated_at DESC");
 
-    if (candidates.length > 0)
-      return List.generate(
-        candidates.length,
-        (i) => Absence.fromMap(candidates[i]),
-      );
+    absences = List.generate(
+      candidates.length,
+      (i) => Absence.fromMap(candidates[i]),
+    );
 
-    return null;
+    notifyListeners();
+    return absences;
   }
 
   Future<Absence> get(int id) {
@@ -35,6 +35,8 @@ class AbsenceService implements Service<Absence> {
     await db.update(
         tableName, {"updated_at": DateTime.now().millisecondsSinceEpoch},
         where: "id = ?", whereArgs: [id]);
+    absences.add(data);
+    notifyListeners();
   }
 
   Future<void> update(Absence data) async {
@@ -43,10 +45,15 @@ class AbsenceService implements Service<Absence> {
     await db.update(
         tableName, {"updated_at": DateTime.now().millisecondsSinceEpoch},
         where: "id = ?", whereArgs: [data.id]);
+    final a = absences.indexWhere((e) => e.id == data.id);
+    absences[a] = data;
+    notifyListeners();
   }
 
   Future<void> delete(Absence data) async {
     await db.delete(tableName, where: "id = ?", whereArgs: [data.id]);
+    absences.remove(data);
+    notifyListeners();
   }
 
   Future<void> increment(Absence absence) async {
@@ -55,10 +62,12 @@ class AbsenceService implements Service<Absence> {
       SET missed_hours = missed_hours + 1, available_hours = available_hours - 1
       WHERE id = ?
     """, [absence.id]);
-  }
 
-  Future<Database> init() async =>
-      await getDatabase().then((value) => db = value);
+    final a = absences.indexWhere((e) => e.id == absence.id);
+    absences[a].missedHours += 1;
+    absences[a].availableHours -= 1;
+    notifyListeners();
+  }
 
   AbsenceService._internal() {
     init();

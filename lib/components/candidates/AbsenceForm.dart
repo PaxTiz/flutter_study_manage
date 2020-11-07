@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_student/components/CustomButton.dart';
 import 'package:macos_student/components/forms/CustomFormField.dart';
 import 'package:macos_student/models/Absence.dart';
 import 'package:macos_student/services/AbsenceService.dart';
+
+import '../../application.dart';
 
 // TODO: Add validator for inputs
 class AbsenceForm extends StatelessWidget {
@@ -39,7 +42,12 @@ class AbsenceForm extends StatelessWidget {
         await service.update(absence);
       }
 
-      Navigator.pop(context);
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => Application(1),
+        ),
+      );
     }
   }
 
